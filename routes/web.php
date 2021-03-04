@@ -34,4 +34,10 @@ Route::prefix('/article')->group(function() {
     Route::patch('/edit/{id}', 'ArticleController@update')->name('article.update');
 
     Route::delete('/delete/{id}', 'ArticleController@delete')->name('article.delete');
+
+    Route::post('/like/{id}', 'ArticleController@like')->name('article.like');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

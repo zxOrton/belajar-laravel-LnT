@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Article;
+use App\Like;
 
 class ArticleController extends Controller
 {
     public function index() {
-        $articles = Article::all();
+        $articles = Article::where('user_id', auth()->user()->id)->get();
         return view('articles', compact('articles'));
-        // associated array
-        // return view('articles', ['articles' => $articles]);
     }
 
     public function create() {
@@ -25,20 +24,15 @@ class ArticleController extends Controller
             'title' => $request->title,
             'author' => $request->author,
             'content' => $request->content,
+            'user_id' => auth()->user()->id
         ]);
-
-        // DATABASE BUILDER
-        // DB::table('articles')->insert([
-        //     'title' => $request->title,
-        //     'author' => $request->author,
-        //     'content' => $request->content,
-        // ]);
         return redirect('/articles');
     }
 
     public function show($id) {
         $article = Article::find($id);
-        return view('show', compact('article'));
+        $likes = count(Like::where('article_id', $article->id)->get());
+        return view('show', compact('article', 'likes'));
     }
 
     public function edit($id) {
@@ -53,14 +47,20 @@ class ArticleController extends Controller
             'author' => $request->author,
             'content' => $request->content,
         ]);
-        // dd($article);
-        // $article->save();
         return redirect('/articles');
     }
 
     public function delete($id) {
         $article = Article::find($id);
         $article->delete();
+        return back();
+    }
+
+    public function like($id) {
+        Like::create([
+            'user_id' => auth()->user()->id,
+            'article_id' => $id,
+        ]);
         return back();
     }
 }
